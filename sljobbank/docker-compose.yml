@@ -1,0 +1,105 @@
+# ─────────────────────────────────────────────────────────────
+#  docker-compose.yml
+#  SL Job Bank — Full Stack Local Development
+#  Usage: docker-compose up -d
+# ─────────────────────────────────────────────────────────────
+
+version: '3.9'
+
+services:
+
+  # ── MySQL 8 ──────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: sljobbank_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: sl_job_bank
+      MYSQL_USER: sljobbank
+      MYSQL_PASSWORD: sljobbank123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./prisma/seed.sql:/docker-entrypoint-initdb.d/01_seed.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - sljobbank_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "sljobbank", "-psljobbank123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot Backend ───────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sljobbank_backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_USERNAME: sljobbank
+      DB_PASSWORD: sljobbank123
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sl_job_bank?useSSL=false&serverTimezone=Asia/Colombo&allowPublicKeyRetrieval=true
+      JWT_SECRET: SLJobBankSuperSecretKey2024MustBeAtLeast256BitsLong!@#$
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-demo}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-demo}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-demo}
+      PAYHERE_MERCHANT_ID: ${PAYHERE_MERCHANT_ID:-demo}
+      PAYHERE_SECRET: ${PAYHERE_SECRET:-demo}
+      MAIL_USERNAME: ${MAIL_USERNAME:-noreply@sljobbank.lk}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+    ports:
+      - "8080:8080"
+    networks:
+      - sljobbank_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── React Frontend ────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sljobbank_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://backend:8080/api
+    ports:
+      - "3000:80"
+    networks:
+      - sljobbank_net
+
+  # ── phpMyAdmin (DB Admin UI) ──────────────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: sljobbank_phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: sljobbank
+      PMA_PASSWORD: sljobbank123
+    ports:
+      - "8081:80"
+    networks:
+      - sljobbank_net
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  sljobbank_net:
+    driver: bridge
