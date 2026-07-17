@@ -10,6 +10,7 @@
     "db:seed": "node src/scripts/seed.js"
   },
   "dependencies": {
+    "@prisma/client": "^6.16.2",
     "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -24,6 +25,7 @@
     "pdfkit": "^0.15.0",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
+    "prisma": "^6.16.2",
     "sequelize": "^6.37.3",
     "uuid": "^9.0.1"
   },
