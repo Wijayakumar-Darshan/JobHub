@@ -1,8 +1,8 @@
-import { DataTypes } from 'sequelize'
-import { sequelize } from '../config/database.js'
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/database.js";
 
-export const User = sequelize.define(
-  'User',
+export const LoginLog = sequelize.define(
+  "LoginLog",
   {
     id: {
       type: DataTypes.UUID,
@@ -10,58 +10,28 @@ export const User = sequelize.define(
       primaryKey: true
     },
 
-    fullName: {
-      type: DataTypes.STRING(100),
+    userId: {
+      type: DataTypes.TEXT,
       allowNull: false,
-      field: 'full_name'
-    },
-
-    email: {
-      type: DataTypes.STRING(150),
-      allowNull: false,
-      unique: true
-    },
-
-    password: {
-      type: DataTypes.STRING(255),
-      allowNull: false
+      field: "user_id"
     },
 
     role: {
-      type: DataTypes.ENUM('STUDENT', 'COUNSELOR', 'SUPER_ADMIN'),
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
+    loginAt: {
+      type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: 'STUDENT'
-    },
-
-    subscriptionType: {
-      type: DataTypes.ENUM('FREE', 'PAID'),
-      allowNull: false,
-      defaultValue: 'FREE',
-      field: 'subscription_type'
-    },
-
-    isActive: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-      field: 'is_active'
-    },
-
-    profileImage: {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-      field: 'profile_image'
-    },
-
-    phoneNumber: {
-      type: DataTypes.STRING(20),
-      allowNull: true,
-      field: 'phone_number'
+      defaultValue: DataTypes.NOW,
+      field: "login_at"
     }
   },
   {
-    tableName: 'users',
-    schema: 'public',
+    tableName: "login_logs",
+    schema: "public",
     timestamps: true,
     underscored: true
   }
-)
+);
