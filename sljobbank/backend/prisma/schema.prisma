@@ -1,20 +1,320 @@
-// ─────────────────────────────────────────────────────────────
-//  prisma/schema.prisma
-//  SL Job Bank & Career Guidance System
-//  Database: MySQL 8+
-// ─────────────────────────────────────────────────────────────
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-// ── Enums ─────────────────────────────────────────────────────
+model User {
+  id                   String                        @id @default(uuid()) @db.Uuid
+  full_name            String                        @db.VarChar(255)
+  email                String                        @unique @db.VarChar(255)
+  password             String                        @db.VarChar(255)
+  role                 enum_users_role?              @default(STUDENT)
+  subscription_type    enum_users_subscription_type? @default(FREE)
+  is_active            Boolean?                      @default(true)
+  created_at           DateTime                      @db.Timestamptz(6)
+  updated_at           DateTime                      @db.Timestamptz(6)
+  career_test_attempts career_test_attempts[]
+  favorites            Favorite[]
+  login_logs           login_logs[]
+  notifications        Notification[]
+  payments             Payment[]
+  student_profiles     student_profiles[]
+
+  @@map("users")
+}
+
+model CareerCluster {
+  id                   String                 @id @default(uuid()) @db.Uuid
+  name                 String                 @db.VarChar(255)
+  created_at           DateTime               @db.Timestamptz(6)
+  updated_at           DateTime               @db.Timestamptz(6)
+  career_test_attempts career_test_attempts[]
+  jobs                 Job[]
+  qualifications       Qualification[]
+  student_profiles     student_profiles[]
+
+  @@map("career_clusters")
+}
+
+model Job {
+  id                 String               @id @default(uuid()) @db.Uuid
+  title              String               @db.VarChar(255)
+  description        String?
+  responsibilities   String?
+  qualifications     String?
+  skills             String?
+  cluster_id         String?              @db.Uuid
+  salary_min         Float?
+  salary_max         Float?
+  industry_demand    String?              @db.VarChar(255)
+  sector             String?              @db.VarChar(255)
+  remote_available   Boolean?             @default(false)
+  created_at         DateTime             @db.Timestamptz(6)
+  updated_at         DateTime             @db.Timestamptz(6)
+  courses            Course[]
+  favorites          Favorite[]
+  job_qualifications job_qualifications[]
+  career_clusters    CareerCluster?       @relation(fields: [cluster_id], references: [id], onDelete: Restrict)
+
+  @@map("jobs")
+}
+
+model Institute {
+  id                       String                   @id @default(uuid()) @db.Uuid
+  name                     String                   @db.VarChar(255)
+  type                     String                   @default("GOVERNMENT") @db.VarChar(255)
+  location                 String?                  @db.VarChar(255)
+  website                  String?                  @db.VarChar(255)
+  description              String?
+  created_at               DateTime                 @db.Timestamptz(6)
+  updated_at               DateTime                 @db.Timestamptz(6)
+  courses                  Course[]
+  institute_qualifications InstituteQualification[]
+  job_qualifications       job_qualifications[]
+
+  @@map("institutes")
+}
+
+model Qualification {
+  id                       String                    @id @default(uuid()) @db.Uuid
+  name                     String                    @db.VarChar(255)
+  level                    enum_qualifications_level
+  field                    String?                   @db.VarChar(255)
+  description              String?                   @db.VarChar(2000)
+  is_active                Boolean?                  @default(true)
+  created_at               DateTime                  @db.Timestamptz(6)
+  updated_at               DateTime                  @db.Timestamptz(6)
+  cluster_id               String?                   @db.Uuid
+  institute_qualifications InstituteQualification[]
+  job_qualifications       job_qualifications[]
+  career_clusters          CareerCluster?            @relation(fields: [cluster_id], references: [id])
+
+  @@map("qualifications")
+}
+
+model InstituteQualification {
+  id               String         @id @default(uuid()) @db.Uuid
+  created_at       DateTime       @db.Timestamptz(6)
+  updated_at       DateTime       @db.Timestamptz(6)
+  institute_id     String?        @db.Uuid
+  qualification_id String?        @db.Uuid
+  institutes       Institute?     @relation(fields: [institute_id], references: [id], onDelete: Cascade)
+  qualifications   Qualification? @relation(fields: [qualification_id], references: [id], onDelete: Cascade)
+
+  @@unique([institute_id, qualification_id])
+  @@map("institute_qualifications")
+}
+
+model Course {
+  id            String     @id @default(uuid()) @db.Uuid
+  name          String     @db.VarChar(255)
+  duration      String?    @db.VarChar(255)
+  fee           Float?
+  delivery_mode String?    @default("FULL_TIME") @db.VarChar(255)
+  created_at    DateTime   @db.Timestamptz(6)
+  updated_at    DateTime   @db.Timestamptz(6)
+  institute_id  String?    @db.Uuid
+  job_id        String?    @db.Uuid
+  institutes    Institute? @relation(fields: [institute_id], references: [id], onDelete: Cascade)
+  jobs          Job?       @relation(fields: [job_id], references: [id])
+
+  @@map("courses")
+}
+
+model CareerTest {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  title                 String                 @db.VarChar(255)
+  purpose               String?                @db.VarChar(2000)
+  what_it_identifies    String?                @db.VarChar(2000)
+  estimated_minutes     String?                @db.VarChar(500)
+  is_active             Boolean?               @default(true)
+  created_at            DateTime               @db.Timestamptz(6)
+  updated_at            DateTime               @db.Timestamptz(6)
+  career_test_attempts  career_test_attempts[]
+  career_test_questions CareerTestQuestion[]
+
+  @@map("career_tests")
+}
+
+model CareerTestQuestion {
+  id                  String                              @id @default(uuid()) @db.Uuid
+  text                String                              @db.VarChar(500)
+  category            enum_career_test_questions_category
+  sort_order          Int?                                @default(0)
+  is_active           Boolean?                            @default(true)
+  created_at          DateTime                            @db.Timestamptz(6)
+  updated_at          DateTime                            @db.Timestamptz(6)
+  test_id             String?                             @db.Uuid
+  career_test_answers career_test_answers[]
+  career_tests        CareerTest?                         @relation(fields: [test_id], references: [id], onDelete: Cascade)
+
+  @@map("career_test_questions")
+}
+
+model Payment {
+  id           String    @id @default(uuid()) @db.Uuid
+  amount       Float
+  status       String?   @default("PENDING") @db.VarChar(255)
+  method       String?   @db.VarChar(255)
+  reference    String?   @db.VarChar(255)
+  payment_date DateTime? @db.Timestamptz(6)
+  created_at   DateTime  @db.Timestamptz(6)
+  updated_at   DateTime  @db.Timestamptz(6)
+  user_id      String?   @db.Uuid
+  users        User?     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Favorite {
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @db.Timestamptz(6)
+  updated_at DateTime @db.Timestamptz(6)
+  user_id    String?  @db.Uuid
+  job_id     String?  @db.Uuid
+  jobs       Job?     @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  users      User?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("favorites")
+}
+
+model StudentView {
+  id       String   @id @default(uuid()) @db.Uuid
+  viewedAt DateTime @default(now())
+  userId   String
+  jobId    String
+
+  @@index([userId])
+  @@index([jobId])
+  @@map("student_views")
+}
+
+model SystemSetting {
+  id              String   @id @default(uuid())
+  paidModeEnabled Boolean  @default(false)
+  monthlyPrice    Float    @default(990)
+  yearlyPrice     Float    @default(8900)
+  bankName        String   @db.VarChar(100)
+  accountNumber   String   @db.VarChar(50)
+  accountHolder   String   @db.VarChar(150)
+  qrCodeImage     String?  @db.VarChar(500)
+  updatedAt       DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+model Notification {
+  id         String   @id @default(uuid()) @db.Uuid
+  title      String?  @db.VarChar(255)
+  message    String?
+  is_read    Boolean? @default(false)
+  created_at DateTime @db.Timestamptz(6)
+  updated_at DateTime @db.Timestamptz(6)
+  user_id    String?  @db.Uuid
+  users      User?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model PasswordReset {
+  id         String   @id @default(uuid()) @db.Uuid
+  email      String   @db.VarChar(255)
+  token_hash String   @db.VarChar(255)
+  expires_at DateTime @db.Timestamptz(6)
+  used       Boolean? @default(false)
+  created_at DateTime @db.Timestamptz(6)
+  updated_at DateTime @db.Timestamptz(6)
+
+  @@map("password_resets")
+}
+
+model admin_audit_logs {
+  id         String   @id @db.Uuid
+  user_id    String?  @db.Uuid
+  action     String   @db.VarChar(255)
+  ip_address String?  @db.VarChar(255)
+  user_agent String?  @db.VarChar(500)
+  success    Boolean? @default(false)
+  detail     String?  @db.VarChar(500)
+  created_at DateTime @db.Timestamptz(6)
+  updated_at DateTime @db.Timestamptz(6)
+}
+
+model career_test_answers {
+  id                    String                @id @db.Uuid
+  value                 Int
+  created_at            DateTime              @db.Timestamptz(6)
+  updated_at            DateTime              @db.Timestamptz(6)
+  attempt_id            String?               @db.Uuid
+  question_id           String?               @db.Uuid
+  career_test_attempts  career_test_attempts? @relation(fields: [attempt_id], references: [id], onDelete: Cascade)
+  career_test_questions CareerTestQuestion?   @relation(fields: [question_id], references: [id], onDelete: Cascade)
+}
+
+model career_test_attempts {
+  id                            String                            @id @db.Uuid
+  status                        enum_career_test_attempts_status? @default(IN_PROGRESS)
+  started_at                    DateTime?                         @db.Timestamptz(6)
+  completed_at                  DateTime?                         @db.Timestamptz(6)
+  scores_json                   String?                           @db.VarChar(1000)
+  holland_code                  String?                           @db.VarChar(10)
+  guidance_text                 String?                           @db.VarChar(4000)
+  student_downloaded_at         DateTime?                         @db.Timestamptz(6)
+  counselor_download_enabled    Boolean?                          @default(false)
+  counselor_download_enabled_by String?                           @db.Uuid
+  counselor_download_enabled_at DateTime?                         @db.Timestamptz(6)
+  created_at                    DateTime                          @db.Timestamptz(6)
+  updated_at                    DateTime                          @db.Timestamptz(6)
+  test_id                       String?                           @db.Uuid
+  user_id                       String?                           @db.Uuid
+  top_cluster_id                String?                           @db.Uuid
+  career_test_answers           career_test_answers[]
+  career_tests                  CareerTest?                       @relation(fields: [test_id], references: [id], onDelete: Cascade)
+  career_clusters               CareerCluster?                    @relation(fields: [top_cluster_id], references: [id])
+  users                         User?                             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model job_qualifications {
+  id               String        @id @db.Uuid
+  job_id           String        @db.Uuid
+  qualification_id String        @db.Uuid
+  institute_id     String?       @db.Uuid
+  required         Boolean?      @default(true)
+  created_at       DateTime      @db.Timestamptz(6)
+  updated_at       DateTime      @db.Timestamptz(6)
+  institutes       Institute?    @relation(fields: [institute_id], references: [id])
+  jobs             Job           @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  qualifications   Qualification @relation(fields: [qualification_id], references: [id])
+}
+
+model login_logs {
+  id         String               @id @db.Uuid
+  user_id    String               @db.Uuid
+  role       enum_login_logs_role
+  login_at   DateTime             @db.Timestamptz(6)
+  created_at DateTime             @db.Timestamptz(6)
+  updated_at DateTime             @db.Timestamptz(6)
+  users      User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model student_profiles {
+  id                  String         @id @db.Uuid
+  al_stream           String?        @db.VarChar(255)
+  grade               String?        @db.VarChar(255)
+  interest_tags       String?        @db.VarChar(1000)
+  cluster_scores_json String?        @db.VarChar(2000)
+  created_at          DateTime       @db.Timestamptz(6)
+  updated_at          DateTime       @db.Timestamptz(6)
+  user_id             String?        @db.Uuid
+  top_cluster_id      String?        @db.Uuid
+  career_clusters     CareerCluster? @relation(fields: [top_cluster_id], references: [id])
+  users               User?          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
 
 enum Role {
   STUDENT
@@ -56,234 +356,46 @@ enum DeliveryMode {
   BLENDED
 }
 
-// ── User ──────────────────────────────────────────────────────
-
-model User {
-  id               String           @id @default(uuid())
-  fullName         String           @db.VarChar(100)
-  email            String           @unique @db.VarChar(150)
-  password         String           @db.VarChar(255)
-  role             Role             @default(STUDENT)
-  subscriptionType SubscriptionType @default(FREE)
-  isActive         Boolean          @default(true)
-  profileImage     String?          @db.VarChar(500)
-  phoneNumber      String?          @db.VarChar(20)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-
-  favorites        Favorite[]
-  payments         Payment[]
-  views            StudentView[]
-  notifications    Notification[]
-  passwordResets   PasswordReset[]
-
-  @@map("users")
+enum enum_career_test_attempts_status {
+  IN_PROGRESS
+  COMPLETED
 }
 
-// ── Career Cluster ────────────────────────────────────────────
-
-model CareerCluster {
-  id          String   @id @default(uuid())
-  name        String   @db.VarChar(150)
-  description String   @db.Text
-  image       String?  @db.VarChar(500)
-  emoji       String?  @db.VarChar(10)
-  color       String?  @db.VarChar(20)
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  jobs        Job[]
-
-  @@map("career_clusters")
+enum enum_career_test_questions_category {
+  REALISTIC
+  INVESTIGATIVE
+  ARTISTIC
+  SOCIAL
+  ENTERPRISING
+  CONVENTIONAL
 }
 
-// ── Job ───────────────────────────────────────────────────────
-
-model Job {
-  id                   String   @id @default(uuid())
-  title                String   @db.VarChar(200)
-  description          String   @db.Text
-  responsibilities     String?  @db.Text
-  qualifications       String   @db.Text
-  skills               String   @db.Text
-  alStream             String   @db.VarChar(100)
-  alSubjects           String   @db.Text
-  salaryMin            Float
-  salaryMax            Float
-  industryDemand       String   @db.VarChar(50)
-  careerPathway        String   @db.Text
-  employmentGrowth     String?  @db.VarChar(100)
-  sector               String?  @db.VarChar(100)
-  remoteAvailable      Boolean  @default(false)
-  internshipAvailable  Boolean  @default(false)
-  governmentAvailable  Boolean  @default(false)
-  privateAvailable     Boolean  @default(true)
-  image                String?  @db.VarChar(500)
-  videoUrl             String?  @db.VarChar(500)
-  externalResources    String?  @db.Text
-  isActive             Boolean  @default(true)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-
-  clusterId String
-  cluster   CareerCluster @relation(fields: [clusterId], references: [id], onDelete: Restrict)
-
-  courses   Course[]
-  favorites Favorite[]
-  views     StudentView[]
-
-  @@index([clusterId])
-  @@index([industryDemand])
-  @@map("jobs")
+enum enum_login_logs_role {
+  STUDENT
+  COUNSELOR
+  SUPER_ADMIN
 }
 
-// ── Institute ─────────────────────────────────────────────────
-
-model Institute {
-  id            String        @id @default(uuid())
-  name          String        @db.VarChar(200)
-  logo          String?       @db.VarChar(500)
-  location      String        @db.VarChar(200)
-  contact       String?       @db.VarChar(100)
-  website       String?       @db.VarChar(300)
-  accreditation String?       @db.VarChar(200)
-  type          InstituteType @default(PRIVATE)
-  isActive      Boolean       @default(true)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  courses       Course[]
-
-  @@map("institutes")
+enum enum_qualifications_level {
+  OL
+  AL
+  CERTIFICATE
+  DIPLOMA
+  HND
+  DEGREE
+  POSTGRADUATE
+  PROFESSIONAL
+  MASTERS
+  NVQ
 }
 
-// ── Course ────────────────────────────────────────────────────
-
-model Course {
-  id            String       @id @default(uuid())
-  name          String       @db.VarChar(200)
-  duration      String       @db.VarChar(50)
-  fee           Float        // dynamic — updatable anytime
-  qualification String       @db.VarChar(100)
-  intakeDates   String?      @db.VarChar(200)
-  description   String?      @db.Text
-  deliveryMode  DeliveryMode @default(FULL_TIME)
-  isActive      Boolean      @default(true)
-  feeUpdatedAt  DateTime     @default(now())
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-
-  instituteId   String
-  institute     Institute @relation(fields: [instituteId], references: [id], onDelete: Restrict)
-
-  jobId         String
-  job           Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
-
-  @@index([instituteId])
-  @@index([jobId])
-  @@map("courses")
+enum enum_users_role {
+  STUDENT
+  COUNSELOR
+  SUPER_ADMIN
 }
 
-// ── Payment ───────────────────────────────────────────────────
-
-model Payment {
-  id          String        @id @default(uuid())
-  amount      Float
-  status      PaymentStatus @default(PENDING)
-  method      PaymentMethod @default(PAYHERE)
-  reference   String?       @db.VarChar(200)
-  plan        String?       @db.VarChar(20) // monthly | yearly
-  paymentDate DateTime      @default(now())
-  verifiedAt  DateTime?
-
-  userId      String
-  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([status])
-  @@map("payments")
-}
-
-// ── Favorite ──────────────────────────────────────────────────
-
-model Favorite {
-  id        String   @id @default(uuid())
-  savedAt   DateTime @default(now())
-
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  jobId     String
-  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, jobId])
-  @@index([userId])
-  @@map("favorites")
-}
-
-// ── Student View ──────────────────────────────────────────────
-
-model StudentView {
-  id        String   @id @default(uuid())
-  viewedAt  DateTime @default(now())
-
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  jobId     String
-  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([jobId])
-  @@map("student_views")
-}
-
-// ── System Setting ────────────────────────────────────────────
-
-model SystemSetting {
-  id                 String   @id @default(uuid())
-  paidModeEnabled    Boolean  @default(false)
-  monthlyPrice       Float    @default(990)
-  yearlyPrice        Float    @default(8900)
-  bankName           String   @db.VarChar(100)
-  accountNumber      String   @db.VarChar(50)
-  accountHolder      String   @db.VarChar(150)
-  qrCodeImage        String?  @db.VarChar(500)
-  updatedAt          DateTime @updatedAt
-
-  @@map("system_settings")
-}
-
-// ── Notification ──────────────────────────────────────────────
-
-model Notification {
-  id        String   @id @default(uuid())
-  title     String   @db.VarChar(200)
-  message   String   @db.Text
-  type      String   @db.VarChar(50)  // info | success | warning
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  userId    String
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("notifications")
-}
-
-// ── Password Reset ────────────────────────────────────────────
-
-model PasswordReset {
-  id        String   @id @default(uuid())
-  token     String   @unique @db.VarChar(500)
-  expiresAt DateTime
-  used      Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  userId    String
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("password_resets")
+enum enum_users_subscription_type {
+  FREE
+  PAID
 }

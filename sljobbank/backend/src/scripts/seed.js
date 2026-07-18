@@ -1,5 +1,14 @@
 import bcrypt from 'bcryptjs';
-import { sequelize, CareerCluster, User, Qualification, Institute, CareerTest, CareerTestQuestion } from '../models/index.js';
+import {
+  sequelize,
+  CareerCluster,
+  User,
+  Qualification,
+  Institute,
+  CareerTest,
+  CareerTestQuestion,
+  Job,                  // <-- added
+} from '../models/index.js';
 
 // ─── The full 50 RIASEC questions ─────────────────────
 const RIASEC_QUESTIONS = [
@@ -76,9 +85,77 @@ const RIASEC_QUESTIONS = [
   ['I like to follow established rules and procedures', 'CONVENTIONAL'],
 ];
 
+// ─── Helper: Generate a random integer ──────────────────────
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// ─── Job generation: 50 jobs per cluster ─────────────────────
+function generateJobsForCluster(clusterName) {
+  const jobs = [];
+  const cluster = clusterName;
+
+  // Base titles per cluster (customise as needed)
+  const titlePrefixes = {
+    'Agriculture, Food & Natural Resources': ['Farm Manager', 'Agronomist', 'Food Scientist', 'Environmental Consultant', 'Forester', 'Veterinarian', 'Horticulturist', 'Soil Scientist', 'Fishery Officer', 'Wildlife Biologist'],
+    'Architecture & Construction': ['Architect', 'Civil Engineer', 'Construction Manager', 'Quantity Surveyor', 'Urban Planner', 'Structural Engineer', 'Interior Designer', 'Building Inspector', 'Landscape Architect', 'Project Manager'],
+    'Arts, Audio/Video Technology & Communications': ['Graphic Designer', 'Video Editor', 'Journalist', 'Public Relations Specialist', 'Animator', 'Web Designer', 'Photographer', 'Content Creator', 'Audio Engineer', 'Film Director'],
+    'Business Management & Administration': ['Business Analyst', 'Operations Manager', 'Project Coordinator', 'Office Administrator', 'Management Consultant', 'HR Generalist', 'Entrepreneur', 'Business Development Manager', 'Operations Director', 'Administrative Assistant'],
+    'Education & Training': ['Teacher', 'Lecturer', 'Educational Consultant', 'Curriculum Developer', 'School Principal', 'Special Education Teacher', 'Instructional Designer', 'Training Coordinator', 'Education Policy Analyst', 'Early Childhood Educator'],
+    'Finance': ['Accountant', 'Financial Analyst', 'Investment Banker', 'Auditor', 'Tax Consultant', 'Risk Manager', 'Wealth Manager', 'Financial Controller', 'Actuary', 'Treasury Analyst'],
+    'Government & Public Administration': ['Policy Analyst', 'Public Administrator', 'City Planner', 'Urban Development Officer', 'Government Liaison', 'Budget Analyst', 'Public Affairs Specialist', 'Court Administrator', 'Immigration Officer', 'Civil Service Manager'],
+    'Health Science': ['Doctor', 'Nurse', 'Pharmacist', 'Medical Lab Technician', 'Physiotherapist', 'Radiographer', 'Occupational Therapist', 'Health Administrator', 'Clinical Researcher', 'Dentist'],
+    'Hospitality & Tourism': ['Hotel Manager', 'Tour Guide', 'Restaurant Manager', 'Event Coordinator', 'Travel Consultant', 'Concierge', 'Executive Chef', 'Resort Manager', 'Tourism Officer', 'Guest Relations Manager'],
+    'Human Services': ['Social Worker', 'Counselor', 'Community Outreach Coordinator', 'Mental Health Advocate', 'Rehabilitation Specialist', 'Youth Worker', 'Case Manager', 'Substance Abuse Counselor', 'Family Support Worker', 'Crisis Intervention Specialist'],
+    'Information Technology': ['Software Developer', 'Network Engineer', 'Data Analyst', 'Systems Administrator', 'Cybersecurity Analyst', 'Cloud Architect', 'Database Administrator', 'Full Stack Developer', 'Machine Learning Engineer', 'IT Project Manager'],
+    'Law, Public Safety, Corrections & Security': ['Police Officer', 'Lawyer', 'Correctional Officer', 'Forensic Analyst', 'Security Consultant', 'Criminal Investigator', 'Firefighter', 'Emergency Manager', 'Immigration Officer', 'Probation Officer'],
+    'Manufacturing': ['Production Manager', 'Industrial Engineer', 'Quality Control Supervisor', 'Supply Chain Planner', 'Mechanical Engineer', 'Plant Operations Manager', 'Process Engineer', 'Maintenance Manager', 'Packaging Engineer', 'Manufacturing Technician'],
+    'Marketing': ['Marketing Manager', 'Brand Strategist', 'Digital Marketing Specialist', 'Sales Director', 'Market Research Analyst', 'Advertising Executive', 'Content Marketing Manager', 'SEO Specialist', 'Social Media Manager', 'Product Marketing Manager'],
+    'Science, Technology, Engineering & Mathematics': ['Research Scientist', 'Biologist', 'Chemist', 'Physicist', 'Data Scientist', 'Statistician', 'Environmental Scientist', 'Materials Engineer', 'Aerospace Engineer', 'Mathematician'],
+    'Transportation, Distribution & Logistics': ['Logistics Manager', 'Supply Chain Analyst', 'Fleet Manager', 'Warehouse Supervisor', 'Transportation Planner', 'Freight Broker', 'Inventory Planner', 'Distribution Center Manager', 'Shipping Coordinator', 'Aviation Manager'],
+  };
+
+  const prefixes = titlePrefixes[clusterName] || ['Professional', 'Specialist', 'Manager', 'Analyst'];
+
+  // Generate 50 jobs for this cluster
+  for (let i = 0; i < 50; i++) {
+    const title = `${prefixes[i % prefixes.length]} ${i + 1}`; // ensure variety
+    const salaryMin = rand(30000, 80000);
+    const salaryMax = rand(salaryMin + 10000, salaryMin + 70000);
+    const demandLevels = ['HIGH', 'MEDIUM', 'LOW'];
+    const industryDemand = demandLevels[rand(0, 2)];
+
+    jobs.push({
+      title,
+      description: `This is a detailed job description for ${title} in the ${clusterName} sector. It involves working on various tasks and projects.`,
+      responsibilities: `- Lead and coordinate projects\n- Manage team members\n- Ensure quality standards\n- Report to senior management`,
+      qualifications: `Bachelor's degree in ${clusterName} or related field.\nMinimum 2-3 years of experience.`,
+      skills: `Communication, problem-solving, teamwork, technical expertise, time management.`,
+      alStream: ['Physical Science', 'Biological Science', 'Commerce', 'Arts', 'Technology'][rand(0, 4)],
+      alSubjects: `Mathematics, English, and one subject related to ${clusterName}.`,
+      salaryMin,
+      salaryMax,
+      industryDemand,
+      careerPathway: `Entry level → Mid level → Senior level → Management → Executive`,
+      employmentGrowth: `${rand(5, 25)}% projected growth over 5 years`,
+      sector: `${clusterName} Sector`,
+      remoteAvailable: rand(0, 1) === 1,
+      internshipAvailable: rand(0, 1) === 1,
+      governmentAvailable: rand(0, 1) === 1,
+      privateAvailable: true,
+      image: `https://via.placeholder.com/400x200?text=${encodeURIComponent(title)}`,
+      videoUrl: null,
+      externalResources: `https://example.com/resources/${encodeURIComponent(title)}`,
+      isActive: true,
+    });
+  }
+  return jobs;
+}
+
+// ─── Main seed function ──────────────────────────────────────
 async function main() {
   await sequelize.authenticate();
-  await sequelize.sync(); 
+  await sequelize.sync();
 
   // ── Career Clusters (16 standard CTE clusters) ──
   let clusters = await CareerCluster.findAll();
@@ -109,7 +186,6 @@ async function main() {
   const qualCount = await Qualification.count();
   let qualifications = [];
   if (qualCount === 0) {
-    // Build a comprehensive list grouped by cluster name
     const qualData = [
       // Information Technology
       { name: 'BSc in Computer Science', level: 'DEGREE', field: 'IT', description: 'Undergraduate degree in computer science', cluster: 'Information Technology' },
@@ -201,7 +277,7 @@ async function main() {
       { name: 'BSc in Logistics Management', level: 'DEGREE', field: 'Logistics', description: 'Supply chain and transport', cluster: 'Transportation, Distribution & Logistics' },
       { name: 'Diploma in Supply Chain Management', level: 'DIPLOMA', field: 'Supply Chain', description: 'Inventory and procurement', cluster: 'Transportation, Distribution & Logistics' },
       { name: 'NVQ Level 5 in Freight Forwarding', level: 'NVQ', field: 'Logistics', description: 'International shipping operations', cluster: 'Transportation, Distribution & Logistics' },
-      // Add more to reach 130+ (we'll add another 20+ generic ones)
+      // Additional to reach 130+
       { name: 'BSc in Electronics Engineering', level: 'DEGREE', field: 'Engineering', description: 'Electronic circuits and systems', cluster: 'Science, Technology, Engineering & Mathematics' },
       { name: 'Diploma in Network Administration', level: 'DIPLOMA', field: 'IT', description: 'Network setup and maintenance', cluster: 'Information Technology' },
       { name: 'BSc in Actuarial Science', level: 'DEGREE', field: 'Finance', description: 'Risk assessment and statistics', cluster: 'Finance' },
@@ -227,14 +303,13 @@ async function main() {
       { name: 'BSc in Urban Planning', level: 'DEGREE', field: 'Architecture', description: 'City development and zoning', cluster: 'Architecture & Construction' },
     ];
 
-    // Map cluster names to IDs
     const qualObjects = qualData.map((q) => ({
       name: q.name,
       level: q.level,
       field: q.field,
       description: q.description,
       clusterId: clusterByName[q.cluster]?.id,
-    })).filter((q) => q.clusterId); // ensure cluster exists
+    })).filter((q) => q.clusterId);
 
     qualifications = await Qualification.bulkCreate(qualObjects);
     console.log(`✅ Seeded ${qualifications.length} qualifications.`);
@@ -246,7 +321,6 @@ async function main() {
   // ── Institutes & Universities (300+) ──
   const instituteCount = await Institute.count();
   if (instituteCount === 0) {
-    // Start with a set of real Sri Lankan universities and institutions
     const baseInstitutes = [
       { name: 'University of Moratuwa', type: 'UNIVERSITY', location: 'Moratuwa', website: 'https://uom.lk', description: 'Leading engineering and IT university' },
       { name: 'University of Colombo', type: 'UNIVERSITY', location: 'Colombo', website: 'https://cmb.ac.lk', description: "Sri Lanka's oldest university" },
@@ -270,25 +344,19 @@ async function main() {
       { name: 'CIMA Sri Lanka', type: 'PROFESSIONAL', location: 'Colombo', website: 'https://cimaglobal.com', description: 'Chartered Institute of Management Accountants' },
       { name: 'SLIATE - Sri Lanka Institute of Advanced Technological Education', type: 'PUBLIC', location: 'Various', website: 'https://sliate.ac.lk', description: 'Advanced technology institutes across Sri Lanka' },
       { name: 'Open University of Sri Lanka', type: 'UNIVERSITY', location: 'Nawala', website: 'https://ou.ac.lk', description: 'Distance education university' },
-      // Add more base institutes to reach a variety; then we'll generate additional with loops.
     ];
 
-    // Generate additional institutes programmatically to reach 300
     const cities = ['Colombo', 'Kandy', 'Galle', 'Matara', 'Jaffna', 'Trincomalee', 'Batticaloa', 'Kurunegala', 'Anuradhapura', 'Badulla', 'Ratnapura', 'Negombo', 'Kalutara', 'Gampaha', 'Mawanella', 'Kegalle', 'Nuwara Eliya', 'Hambantota', 'Ampara', 'Polonnaruwa'];
     const types = ['UNIVERSITY', 'PRIVATE', 'PUBLIC', 'PROFESSIONAL', 'COLLEGE', 'INSTITUTE'];
     const suffixes = ['Institute of Technology', 'Campus', 'College of Studies', 'Academy', 'School of Excellence', 'Centre for Higher Education', 'University College'];
 
-    // Start with base list
     let allInstituteData = [...baseInstitutes];
-
-    // Generate more until we reach 300
     let counter = 1;
     while (allInstituteData.length < 300) {
       const city = cities[Math.floor(Math.random() * cities.length)];
       const type = types[Math.floor(Math.random() * types.length)];
       const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
       const name = `${suffix} - ${city} (${counter})`;
-      // Ensure uniqueness (if duplicate, increment counter)
       if (!allInstituteData.some(i => i.name === name)) {
         allInstituteData.push({
           name,
@@ -301,25 +369,41 @@ async function main() {
       counter++;
     }
 
-    // Shuffle to mix real and generated
     allInstituteData = allInstituteData.sort(() => Math.random() - 0.5);
 
-    // Create institutes and associate qualifications
     const createdInstitutes = [];
     for (const instData of allInstituteData) {
       const inst = await Institute.create(instData);
       createdInstitutes.push(inst);
 
-      // Randomly assign 5-15 qualifications to each institute
-      const numQuals = Math.floor(Math.random() * 10) + 5; // 5-15
+      const numQuals = Math.floor(Math.random() * 10) + 5;
       const shuffledQuals = qualifications.sort(() => Math.random() - 0.5);
       const selectedQuals = shuffledQuals.slice(0, numQuals).map(q => q.id);
       if (selectedQuals.length) {
         await inst.setQualificationsOffered(selectedQuals);
       }
     }
-
     console.log(`✅ Seeded ${createdInstitutes.length} institutes/universities.`);
+  }
+
+  // ── Jobs: 50 per cluster ────────────────────────────────────
+  const jobCount = await Job.count();
+  if (jobCount === 0) {
+    const allJobData = [];
+    for (const cluster of clusters) {
+      const jobs = generateJobsForCluster(cluster.name);
+      // Assign clusterId to each job
+      jobs.forEach(job => {
+        job.clusterId = cluster.id;
+      });
+      allJobData.push(...jobs);
+    }
+
+    // Bulk insert all jobs
+    const createdJobs = await Job.bulkCreate(allJobData);
+    console.log(`✅ Seeded ${createdJobs.length} jobs (50 per cluster).`);
+  } else {
+    console.log(`✅ Jobs already exist (${jobCount} found). Skipping job seeding.`);
   }
 
   // ── Admin User ──
@@ -380,7 +464,7 @@ async function main() {
     console.log('✅ Seeded the Career Key test with 50 RIASEC questions.');
   }
 
-  console.log('🎉 Seed complete. All 16 clusters, 130+ qualifications, and 300+ institutes have been seeded.');
+  console.log('🎉 Seed complete. All 16 clusters, 130+ qualifications, 300+ institutes, and 800 jobs (50 per cluster) have been seeded.');
   process.exit(0);
 }
 
