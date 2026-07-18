@@ -6,9 +6,13 @@ import { ok } from '../utils/apiResponse.js'
 const router = Router()
 
 async function getOrCreate() {
-  let setting = await SystemSetting.findOne({ order: [['createdAt', 'ASC']] })
-  if (!setting) setting = await SystemSetting.create({})
-  return setting
+  let setting = await SystemSetting.findOne();
+
+  if (!setting) {
+    setting = await SystemSetting.create({});
+  }
+
+  return setting;
 }
 
 router.get('/', requireAuth, async (req, res) => res.json(ok(await getOrCreate())))
