@@ -7,7 +7,7 @@ const router = Router()
 router.use(requireAuth)
 
 async function getSettings() {
-  let setting = await SystemSetting.findOne({ order: [['createdAt', 'ASC']] })
+  let setting = await SystemSetting.findOne()   // no order needed
   if (!setting) setting = await SystemSetting.create({})
   return setting
 }
