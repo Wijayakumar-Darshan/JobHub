@@ -53,6 +53,6 @@ export const SystemSetting = sequelize.define('SystemSetting', {
   },
 }, {
   tableName: 'system_settings',
-  timestamps: false,
-  underscored: false,
+  timestamps: false,        // CRITICAL: prevents looking for createdAt/updatedAt
+  underscored: false,       // prevents automatic snake_case conversion
 });
