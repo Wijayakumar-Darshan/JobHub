@@ -36,7 +36,7 @@ export const SystemSetting = sequelize.define('SystemSetting', {
   },
   qrCodeImage: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: true,   // matches your table
   },
   updatedAt: {
     type: DataTypes.DATE,
@@ -44,6 +44,5 @@ export const SystemSetting = sequelize.define('SystemSetting', {
   },
 }, {
   tableName: 'system_settings',
-  timestamps: false,        // we manually handle updatedAt
-  // or add createdAt if you want it
+  timestamps: false,   // we manage updatedAt manually
 });
