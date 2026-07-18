@@ -6,9 +6,14 @@ import { ok } from '../utils/apiResponse.js'
 const router = Router()
 
 async function getOrCreate() {
+  console.log("Loading system settings...");
+
   let setting = await SystemSetting.findOne();
 
+  console.log("Found setting:", setting);
+
   if (!setting) {
+    console.log("Creating default setting...");
     setting = await SystemSetting.create({});
   }
 
