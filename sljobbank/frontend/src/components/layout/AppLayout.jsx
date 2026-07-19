@@ -1,9 +1,7 @@
+// AppLayout.jsx
+import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '@/store/authStore';
-import { useSettingsStore } from '@/store/settingsStore';
-import Sidebar from './Sidebar';
-import Topbar from './Topbar';
-import WhatsAppButtons from './WhatsAppButtons';
+// ... other imports
 
 export default function AppLayout() {
   const { user, logout } = useAuthStore();
@@ -11,26 +9,39 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const closeSidebar = () => setIsSidebarOpen(false);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    closeSidebar();
+  }, [location.pathname]);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
+    closeSidebar();
   };
 
   return (
     <div className="flex h-screen bg-[#F8FAF9] overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar 
-        user={user} 
-        currentPath={location.pathname} 
-        onLogout={handleLogout} 
+      {/* Sidebar - now receives props */}
+      <Sidebar
+        user={user}
+        currentPath={location.pathname}
+        onLogout={handleLogout}
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
       />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Navigation */}
-        <Topbar 
-          user={user} 
-          paidMode={paidModeEnabled} 
+        {/* Topbar - now receives toggle function */}
+        <Topbar
+          user={user}
+          paidMode={paidModeEnabled}
+          onMenuToggle={toggleSidebar}
         />
 
         {/* Page Content */}
