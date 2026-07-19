@@ -24,7 +24,25 @@ import reportRoutes from './routes/report.routes.js'
 import chatRoutes from './routes/chat.routes.js'
 
 const app = express()
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }))
+// List of allowed origins (from environment variable, comma-separated)
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:3000', 'http://localhost:5173'];
+
+// Allow any Vercel preview subdomain (optional)
+const vercelRegex = /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/;
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || vercelRegex.test(origin) || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
 app.use(express.json())
 app.use(morgan('dev'))
 
