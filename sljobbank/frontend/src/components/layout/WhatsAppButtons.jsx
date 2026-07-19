@@ -1,13 +1,11 @@
 const GROUPS = [
   {
     label: '13-Year Education',
-    sub: 'Grade 1–13 support',
     url: 'https://chat.whatsapp.com/REPLACE_WITH_13YEAR_GROUP_LINK',
     color: '#25D366',
   },
   {
     label: 'A/L Stream',
-    sub: 'Advanced Level guidance',
     url: 'https://chat.whatsapp.com/REPLACE_WITH_AL_STREAM_GROUP_LINK',
     color: '#128C7E',
   },
