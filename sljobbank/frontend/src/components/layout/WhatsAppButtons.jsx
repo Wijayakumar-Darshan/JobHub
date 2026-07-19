@@ -1,16 +1,13 @@
-// Two WhatsApp group links, shown as floating buttons on every dashboard layout.
-// Replace these with your real group invite links before deploying.
-
 const GROUPS = [
   {
-    label: '13-Year Education Group',
-    sub: 'Grade 1–13 consistent education support',
+    label: '13-Year Education',
+    sub: 'Grade 1–13 support',
     url: 'https://chat.whatsapp.com/REPLACE_WITH_13YEAR_GROUP_LINK',
     color: '#25D366',
   },
   {
-    label: 'A/L Stream Group',
-    sub: 'Advanced Level stream discussion & guidance',
+    label: 'A/L Stream',
+    sub: 'Advanced Level guidance',
     url: 'https://chat.whatsapp.com/REPLACE_WITH_AL_STREAM_GROUP_LINK',
     color: '#128C7E',
   },
@@ -21,11 +18,11 @@ export default function WhatsAppButtons() {
     <div
       style={{
         position: 'fixed',
-        right: 20,
-        bottom: 20,
+        right: 15,
+        bottom: 15,
         display: 'flex',
         flexDirection: 'column',
-        gap: 14,
+        gap: 10,
         zIndex: 999,
       }}
     >
@@ -39,39 +36,38 @@ export default function WhatsAppButtons() {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
-            minWidth: 290,
-            padding: '14px 18px',
-            borderRadius: 18,
+            gap: 8,
+            width: 190,
+            padding: '8px 12px',
+            borderRadius: 14,
             textDecoration: 'none',
             color: '#fff',
             background: `linear-gradient(135deg, ${g.color}, ${g.color}CC)`,
-            boxShadow: '0 10px 30px rgba(0,0,0,0.25)',
-            backdropFilter: 'blur(10px)',
+            boxShadow: '0 6px 18px rgba(0,0,0,0.22)',
             transition: 'all .25s ease',
-            border: '1px solid rgba(255,255,255,.18)',
+            border: '1px solid rgba(255,255,255,.15)',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'
+            e.currentTarget.style.transform = 'translateY(-3px) scale(1.03)'
             e.currentTarget.style.boxShadow =
-              '0 16px 35px rgba(0,0,0,.35)'
+              '0 10px 25px rgba(0,0,0,.3)'
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0) scale(1)'
             e.currentTarget.style.boxShadow =
-              '0 10px 30px rgba(0,0,0,.25)'
+              '0 6px 18px rgba(0,0,0,.22)'
           }}
         >
           <div
             style={{
-              width: 46,
-              height: 46,
+              width: 32,
+              height: 32,
               borderRadius: '50%',
               background: 'rgba(255,255,255,.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 24,
+              fontSize: 16,
               flexShrink: 0,
             }}
           >
@@ -81,9 +77,9 @@ export default function WhatsAppButtons() {
           <div style={{ flex: 1 }}>
             <div
               style={{
-                fontSize: 15,
+                fontSize: 12,
                 fontWeight: 700,
-                marginBottom: 3,
+                marginBottom: 2,
               }}
             >
               {g.label}
@@ -91,9 +87,8 @@ export default function WhatsAppButtons() {
 
             <div
               style={{
-                fontSize: 12,
+                fontSize: 10,
                 opacity: 0.9,
-                lineHeight: 1.4,
               }}
             >
               {g.sub}
@@ -102,7 +97,7 @@ export default function WhatsAppButtons() {
 
           <div
             style={{
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: 'bold',
             }}
           >
