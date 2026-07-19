@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+console.log('🔥 authStore file is being executed');
+
 export const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -29,5 +31,7 @@ export const useAuthStore = create(
     },
   ),
 )
+
+console.log('✅ useAuthStore exported, type:', typeof useAuthStore);
 
 
