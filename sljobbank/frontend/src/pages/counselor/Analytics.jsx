@@ -157,3 +157,4 @@ function StatCard({ icon, label, value, gradient, textColor }) {
     </div>
   )
 }
+

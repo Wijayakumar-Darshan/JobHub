@@ -7,3 +7,5 @@ const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 // the rest of the app works fine without it.
 export const supabase = (url && anonKey) ? createClient(url, anonKey) : null
 export const isChatRealtimeConfigured = !!supabase
+
+

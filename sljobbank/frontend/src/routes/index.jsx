@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '/src/store/authStore'
 import { useSettingsStore } from '@/store/settingsStore'
 
 // Layouts
@@ -138,3 +138,5 @@ export default function AppRouter() {
     </Routes>
   )
 }
+
+

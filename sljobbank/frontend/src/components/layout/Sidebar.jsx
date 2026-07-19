@@ -40,3 +40,4 @@ export default function Sidebar({ user, currentPath, onLogout, isOpen, onClose }
     </>
   );
 }
+

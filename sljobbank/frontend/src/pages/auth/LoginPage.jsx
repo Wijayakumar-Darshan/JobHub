@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { authApi } from '@/api'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '/src/store/authStore'
 import { useSettingsStore } from '@/store/settingsStore'
 
 const ROLE_ROUTES = {
@@ -245,3 +245,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

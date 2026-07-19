@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { chatApi } from '@/api';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '/src/store/authStore';
 import { supabase, isChatRealtimeConfigured } from '@/lib/supabaseClient';
 import { formatDistanceToNow } from 'date-fns';
 import { Send, Edit2, Trash2, Users } from 'lucide-react';
@@ -238,3 +238,4 @@ export default function ChatPage() {
     </div>
   );
 }
+

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { authApi } from '@/api'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '/src/store/authStore'
 
 // One-time setup: creates the single SUPER_ADMIN account. The backend refuses
 // this (409) if an admin already exists, so it's safe to leave this page
@@ -130,3 +130,4 @@ export default function AdminSetupPage() {
     </div>
   )
 }
+

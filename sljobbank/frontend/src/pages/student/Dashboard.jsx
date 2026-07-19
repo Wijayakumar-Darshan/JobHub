@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { studentProfileApi, jobApi } from '@/api';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '/src/store/authStore';
 import {
   Briefcase,
   ChevronRight,
@@ -228,3 +228,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

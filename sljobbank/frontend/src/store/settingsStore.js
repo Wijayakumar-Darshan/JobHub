@@ -10,3 +10,5 @@ export const useSettingsStore = create((set) => ({
 
   setSettings: (settings) => set(settings),
 }))
+
+

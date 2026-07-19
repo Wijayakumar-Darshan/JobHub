@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { careerTestResultApi } from '@/api'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '/src/store/authStore'
 
 export default function CareerResultsPage() {
   const { user } = useAuthStore()
@@ -92,3 +92,5 @@ export default function CareerResultsPage() {
     </div>
   )
 }
+
+
