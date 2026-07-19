@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { analyticsApi, careerTestResultApi } from '@/api';
-import { useAuthStore } from '/src/store/authStore';
+import useAuthStore from '/src/store/authStore';
 import {
   Users,
   Briefcase,
@@ -209,4 +209,5 @@ function ActionCard({ icon, title, desc, onClick, badge }) {
     </button>
   );
 }
+
 

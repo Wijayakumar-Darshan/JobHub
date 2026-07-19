@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import AppRouter from './routes'
-import { useAuthStore } from './store/authStore'
+import useAuthStore from './store/authStore'
 import { useSettingsStore } from './store/settingsStore'
 import { settingsApi } from './api'
 
@@ -19,5 +19,6 @@ export default function App() {
 
   return <AppRouter />
 }
+
 
 

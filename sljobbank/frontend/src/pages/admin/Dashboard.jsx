@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { analyticsApi } from '@/api';
-import { useAuthStore } from '/src/store/authStore';
+import useAuthStore from '/src/store/authStore';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
@@ -177,4 +177,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
 

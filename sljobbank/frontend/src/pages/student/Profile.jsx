@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { studentProfileApi } from '@/api'
-import { useAuthStore } from '/src/store/authStore'
+import useAuthStore from '/src/store/authStore'
 
 const GRADES = ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12 (A/L)', 'Grade 13 (A/L)', 'Completed A/L', 'Undergraduate']
 const AL_STREAMS = ['Physical Science', 'Biological Science', 'Commerce', 'Arts', 'Technology', 'N/A - below A/L']
@@ -197,4 +197,5 @@ export default function ProfilePage() {
     </div>
   )
 }
+
 

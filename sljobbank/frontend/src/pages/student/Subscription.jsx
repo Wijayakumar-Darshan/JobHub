@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { subscriptionApi } from '@/api'
-import { useAuthStore } from '/src/store/authStore'
+import useAuthStore from '/src/store/authStore'
 
 export default function SubscriptionPage() {
   const { user, updateUser } = useAuthStore()
@@ -207,4 +207,5 @@ export default function SubscriptionPage() {
     </div>
   )
 }
+
 
