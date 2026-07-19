@@ -2,10 +2,14 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useSettingsStore } from '../../store/settingsStore';
-// ... other imports
+import useAuthStore from '../../store/authStore';          // ✅ ADD THIS LINE
+import Sidebar from './Sidebar';
+import Topbar from './Topbar';
+import WhatsAppButtons from '../../components/WhatsAppButtons';
+// ... any other imports
 
 export default function AppLayout() {
-  const { user, logout } = useAuthStore();
+  const { user, logout } = useAuthStore();                // now works
   const { paidModeEnabled } = useSettingsStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -14,7 +18,6 @@ export default function AppLayout() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
 
-  // Close sidebar on route change (mobile)
   useEffect(() => {
     closeSidebar();
   }, [location.pathname]);
@@ -27,7 +30,6 @@ export default function AppLayout() {
 
   return (
     <div className="flex h-screen bg-[#F8FAF9] overflow-hidden">
-      {/* Sidebar - now receives props */}
       <Sidebar
         user={user}
         currentPath={location.pathname}
@@ -35,27 +37,19 @@ export default function AppLayout() {
         isOpen={isSidebarOpen}
         onClose={closeSidebar}
       />
-
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Topbar - now receives toggle function */}
         <Topbar
           user={user}
           paidMode={paidModeEnabled}
           onMenuToggle={toggleSidebar}
         />
-
-        {/* Page Content */}
         <main className="flex-1 overflow-auto bg-[#F8FAF9] p-6 md:p-8 lg:p-10">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
         </main>
       </div>
-
-      {/* Floating WhatsApp Buttons */}
       <WhatsAppButtons />
     </div>
   );
 }
-
