@@ -1,111 +1,91 @@
 import { useNavigate } from 'react-router-dom';
 
-const C = {
-  primary: '#0A2E1C',
-  accent: '#E8A200',
-  dark: '#062017',
-  light: '#ffffff',
-};
+const C = { primary: '#0A2E1C', accent: '#E8A200' };
 
 const NAV = {
-  // ... your NAV object remains unchanged
-};
+  STUDENT: [
+    { section:'Main' },
+    { path:'/student/dashboard',    icon:'🏠', label:'Dashboard' },
+    { path:'/student/clusters',     icon:'🗂️', label:'Career Clusters' },
+    { path:'/student/jobs',         icon:'💼', label:'Browse Jobs' },
+    { path:'/student/favorites',    icon:'❤️', label:'Saved Jobs' },
+    { section:'Career Guidance' },
+    { path:'/student/career-test',  icon:'🧭', label:'Career Key Test' },
+    { path:'/student/chat',         icon:'💬', label:'Community Chat' },
+    { section:'Account' },
+    { path:'/student/subscription', icon:'💳', label:'Subscription' },
+    { path:'/student/profile',      icon:'👤', label:'My Profile' },
+  ],
+  COUNSELOR: [
+    { section:'Management' },
+    { path:'/counselor/dashboard',  icon:'🏠', label:'Dashboard' },
+    { path:'/counselor/jobs',       icon:'💼', label:'Manage Jobs' },
+    { path:'/counselor/institutes', icon:'🏫', label:'Institutes & Universities' },
+    { section:'Career Guidance' },
+    { path:'/counselor/career-results', icon:'🧭', label:'Career Key Results' },
+    { path:'/counselor/chat',       icon:'💬', label:'Community Chat' },
+    { section:'Insights' },
+    { path:'/counselor/analytics',  icon:'📊', label:'Analytics' },
+    { path:'/counselor/reports',    icon:'📋', label:'Reports' },
+  ],
+  SUPER_ADMIN: [
+    { section:'Management' },
+    { path:'/admin/dashboard',    icon:'🏠', label:'Dashboard' },
+    { path:'/admin/users',        icon:'👥', label:'User Management' },
+    { path:'/admin/clusters',     icon:'🗂️', label:'Career Clusters' },
+    { path:'/admin/jobs',         icon:'💼', label:'Job Management' },
+    { path:'/admin/qualifications', icon:'🎓', label:'Qualifications' },
+    { path:'/admin/institutes',   icon:'🏫', label:'Institutes & Universities' },
+    { section:'Career Guidance' },
+    { path:'/admin/career-results', icon:'🧭', label:'Career Key Results' },
+    { path:'/admin/chat',         icon:'💬', label:'Community Chat' },
+    { section:'System' },
+    { path:'/admin/subscription', icon:'💳', label:'Subscription Control' },
+    { path:'/admin/payments',     icon:'💰', label:'Payment History' },
+    { path:'/admin/settings',     icon:'⚙️', label:'System Settings' },
+    { path:'/admin/analytics',    icon:'📊', label:'Analytics' },
+    { path:'/admin/reports',      icon:'📋', label:'Reports' },
+  ],
+}
 
-const ROLE_LABELS = {
-  STUDENT: 'Student',
-  COUNSELOR: 'Counselor',
-  SUPER_ADMIN: 'Super Admin',
-};
+const ROLE_LABELS = { STUDENT:'Student', COUNSELOR:'Counselor', SUPER_ADMIN:'Super Admin' }
 
-export default function Sidebar({ user, currentPath, onLogout }) {
+export default function Sidebar({ user, currentPath, onLogout, onClose }) {
   const navigate = useNavigate();
   const items = NAV[user?.role] || [];
 
+  const handleClick = (path) => {
+    navigate(path);
+    if (onClose) onClose();
+  };
+
   return (
-    <div
-      style={{
-        width: 248,
-        background: C.primary,
-        color: C.light,
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-        boxShadow: '4px 0 20px rgba(0,0,0,0.25)',
-        flexShrink: 0,
-        position: 'relative',
-        zIndex: 100,
-      }}
-    >
-      {/* Logo Header */}
-      <div
-        style={{
-          padding: '28px 20px 20px',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-          background: C.dark,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 28 }}>🇱🇰</div>
+    <div className="h-full flex flex-col">
+      {/* Logo */}
+      <div className="p-6 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">🇱🇰</span>
           <div>
-            <div
-              style={{
-                fontSize: 18,
-                fontWeight: 900,
-                letterSpacing: '-0.5px',
-                color: C.accent,
-              }}
-            >
+            <div className="text-xl font-black text-[#E8A200] tracking-tight">
               SL Job Bank
             </div>
-            <div
-              style={{
-                fontSize: 11,
-                color: 'rgba(255,255,255,0.5)',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                marginTop: 1,
-              }}
-            >
-              Career Guidance
+            <div className="text-[10px] text-white/50 uppercase tracking-widest">
+              Career Guidance System
             </div>
           </div>
         </div>
 
-        <div
-          style={{
-            marginTop: 16,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '5px 12px',
-            background: 'rgba(232, 162, 0, 0.15)',
-            borderRadius: 9999,
-            fontSize: 12,
-            fontWeight: 700,
-            color: C.accent,
-          }}
-        >
+        <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-white/10 text-[#E8A200] text-xs font-bold">
           {ROLE_LABELS[user?.role]}
         </div>
       </div>
 
       {/* Navigation */}
-      <nav style={{ flex: 1, padding: '12px 0', overflowY: 'auto' }}>
+      <nav className="flex-1 overflow-y-auto py-4">
         {items.map((item, i) => {
           if (item.section) {
             return (
-              <div
-                key={i}
-                style={{
-                  fontSize: 11,
-                  fontWeight: 800,
-                  color: 'rgba(255,255,255,0.35)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.8px',
-                  padding: '16px 20px 6px',
-                  marginTop: i > 0 ? 8 : 0,
-                }}
-              >
+              <div key={i} className="nav-section">
                 {item.section}
               </div>
             );
@@ -116,31 +96,10 @@ export default function Sidebar({ user, currentPath, onLogout }) {
           return (
             <div
               key={item.path}
-              onClick={() => navigate(item.path)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 14,
-                padding: '11px 20px',
-                margin: '2px 8px',
-                borderRadius: 10,
-                cursor: 'pointer',
-                fontSize: 14,
-                fontWeight: 600,
-                color: active ? C.accent : 'rgba(255,255,255,0.85)',
-                background: active ? 'rgba(232,162,0,0.12)' : 'transparent',
-                borderLeft: active ? `4px solid ${C.accent}` : '4px solid transparent',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                userSelect: 'none',
-              }}
-              onMouseEnter={(e) => {
-                if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-              }}
-              onMouseLeave={(e) => {
-                if (!active) e.currentTarget.style.background = 'transparent';
-              }}
+              onClick={() => handleClick(item.path)}
+              className={`sidebar-nav-item ${active ? 'active' : ''}`}
             >
-              <span style={{ fontSize: 18, width: 24 }}>{item.icon}</span>
+              <span className="text-xl">{item.icon}</span>
               <span>{item.label}</span>
             </div>
           );
@@ -148,71 +107,22 @@ export default function Sidebar({ user, currentPath, onLogout }) {
       </nav>
 
       {/* Footer */}
-      <div
-        style={{
-          padding: '20px',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          background: C.dark,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: '50%',
-              background: '#E8A200',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 20,
-              flexShrink: 0,
-            }}
-          >
-            👤
+      <div className="p-5 border-t border-white/10 mt-auto">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#E8A200] to-amber-600 flex items-center justify-center text-[#0A2E1C] font-bold text-xl">
+            {user?.fullName?.[0]}
           </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>
+          <div className="min-w-0">
+            <div className="font-semibold text-white text-sm truncate">
               {user?.fullName}
             </div>
-            <div
-              style={{
-                fontSize: 12,
-                color: 'rgba(255,255,255,0.5)',
-                marginTop: 2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {user?.email}
-            </div>
+            <div className="text-white/50 text-xs truncate">{user?.email}</div>
           </div>
         </div>
 
         <button
           onClick={onLogout}
-          style={{
-            marginTop: 16,
-            width: '100%',
-            padding: '10px 16px',
-            background: 'rgba(255,255,255,0.08)',
-            color: 'rgba(255,255,255,0.85)',
-            border: 'none',
-            borderRadius: 8,
-            fontSize: 13.5,
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255,60,60,0.15)';
-            e.currentTarget.style.color = '#ffcccc';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-            e.currentTarget.style.color = 'rgba(255,255,255,0.85)';
-          }}
+          className="w-full btn-ghost text-white border-white/20 hover:bg-white/10 hover:text-white"
         >
           ↩ Sign Out
         </button>

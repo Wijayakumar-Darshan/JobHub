@@ -1,145 +1,85 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom'
 
 const PAGE_TITLES = {
-  // ... your PAGE_TITLES object remains the same
-};
-
-function Avatar({ name, size = 38 }) {
-  const initial = name?.[0]?.toUpperCase() || '?';
-  return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '50%',
-        background: 'linear-gradient(135deg, #E8A200, #D38F00)',
-        color: '#0A2E1C',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontWeight: 800,
-        fontSize: size * 0.42,
-        flexShrink: 0,
-        boxShadow: '0 2px 6px rgba(232, 162, 0, 0.3)',
-        border: '2px solid #fff',
-      }}
-    >
-      {initial}
-    </div>
-  );
+  '/student/dashboard':    'Student Dashboard',
+  '/student/clusters':     'Career Clusters',
+  '/student/jobs':         'Browse Jobs',
+  '/student/favorites':    'Saved Jobs',
+  '/student/career-test':  'Career Key Test',
+  '/student/chat':         'Community Chat',
+  '/student/subscription': 'Subscription',
+  '/student/profile':      'My Profile',
+  '/counselor/dashboard':  'Counselor Dashboard',
+  '/counselor/jobs':       'Manage Jobs',
+  '/counselor/institutes': 'Institutes & Universities',
+  '/counselor/career-results': 'Career Key Results',
+  '/counselor/chat':       'Community Chat',
+  '/counselor/analytics':  'Analytics',
+  '/counselor/reports':    'Reports',
+  '/admin/dashboard':      'Admin Dashboard',
+  '/admin/users':          'User Management',
+  '/admin/clusters':       'Career Clusters',
+  '/admin/jobs':           'Job Management',
+  '/admin/qualifications': 'Qualifications',
+  '/admin/institutes':     'Institutes & Universities',
+  '/admin/career-results': 'Career Key Results',
+  '/admin/chat':           'Community Chat',
+  '/admin/subscription':   'Subscription Control',
+  '/admin/payments':       'Payment History',
+  '/admin/settings':       'System Settings',
+  '/admin/analytics':      'Analytics',
+  '/admin/reports':        'Reports',
 }
 
-export default function Topbar({ user, paidMode }) {
+function Avatar({ name, size=34 }) {
+  return (
+    <div style={{ width:size, height:size, borderRadius:'50%', background:'#0A2E1C', color:'#E8A200', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:size*0.38, flexShrink:0 }}>
+      {name?.[0]?.toUpperCase()}
+    </div>
+  )
+}
+
+export default function Topbar({ user, paidMode, toggleMobileMenu }) {
   const { pathname } = useLocation();
 
-  // Match longest prefix
   const title = Object.entries(PAGE_TITLES)
     .sort((a, b) => b[0].length - a[0].length)
     .find(([k]) => pathname.startsWith(k))?.[1] || 'Dashboard';
 
   return (
-    <div
-      style={{
-        background: '#ffffff',
-        height: 68,
-        padding: '0 28px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        borderBottom: '1px solid #E5E7EB',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-        flexShrink: 0,
-        position: 'sticky',
-        top: 0,
-        zIndex: 90,
-      }}
-    >
-      {/* Left Side - Page Title */}
-      <div>
-        <div
-          style={{
-            fontSize: 20,
-            fontWeight: 800,
-            color: '#0F172A',
-            letterSpacing: '-0.4px',
-          }}
+    <div className="h-16 bg-white border-b border-[#E2E8E4] px-4 md:px-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+      <div className="flex items-center gap-4">
+        {/* Hamburger - Mobile Only */}
+        <button
+          onClick={toggleMobileMenu}
+          className="md:hidden w-10 h-10 flex items-center justify-center text-2xl text-gray-700"
         >
-          {title}
-        </div>
-        <div
-          style={{
-            fontSize: 13,
-            color: '#64748B',
-            marginTop: 1,
-          }}
-        >
-          Sri Lanka Job Bank • Career Guidance System
+          ☰
+        </button>
+
+        <div>
+          <h1 className="page-title">{title}</h1>
+          <p className="page-sub">Sri Lanka Job Bank • Career Guidance</p>
         </div>
       </div>
 
-      {/* Right Side */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        {/* Paid Mode Badge */}
+      <div className="flex items-center gap-4">
         {paidMode && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 12.5,
-              fontWeight: 700,
-              padding: '6px 14px',
-              background: '#FEF3C7',
-              color: '#92400E',
-              borderRadius: 9999,
-              border: '1px solid #FDE68C',
-            }}
-          >
+          <div className="badge badge-warn text-xs">
             💳 Paid Mode Active
           </div>
         )}
 
-        {/* Greeting */}
-        <div
-          style={{
-            textAlign: 'right',
-            marginRight: 4,
-          }}
-        >
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F2937' }}>
-            Hi, {user?.fullName?.split(' ')[0] || 'User'}
-          </div>
-          <div style={{ fontSize: 12, color: '#6B7280' }}>
-            {user?.role === 'SUPER_ADMIN' ? 'Super Administrator' : user?.role}
+        <div className="text-right hidden sm:block">
+          <div className="font-semibold text-sm">Hi, {user?.fullName?.split(' ')[0]}</div>
+          <div className="text-xs text-gray-500">
+            {user?.role === 'SUPER_ADMIN' ? 'Super Admin' : user?.role}
           </div>
         </div>
 
-        {/* Avatar */}
-        <Avatar name={user?.fullName} size={42} />
-
-        {/* Optional: Quick Actions (can be extended later) */}
-        <div style={{ width: 1, height: 32, background: '#E5E7EB', margin: '0 8px' }} />
-
-        <button
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: '50%',
-            background: 'transparent',
-            border: '1px solid #E5E7EB',
-            color: '#64748B',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            fontSize: 18,
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = '#F8FAFC')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-        >
-          ⚙️
-        </button>
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#E8A200] to-amber-600 flex items-center justify-center text-[#0A2E1C] font-bold shadow">
+          {user?.fullName?.[0]?.toUpperCase()}
+        </div>
       </div>
     </div>
   );
