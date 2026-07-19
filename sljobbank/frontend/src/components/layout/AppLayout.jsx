@@ -1,7 +1,7 @@
 // AppLayout.jsx
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import useAuthStore from '../../store/authStore';
+import { useSettingsStore } from '../../store/settingsStore';
 // ... other imports
 
 export default function AppLayout() {
