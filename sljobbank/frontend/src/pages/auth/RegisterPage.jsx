@@ -24,19 +24,31 @@ export default function RegisterPage() {
   const [interests, setInterests] = useState([])
 
   async function onCreateAccount(data) {
-    setLoading(true)
-    try {
-      const res = await authApi.register({ fullName: data.fullName, email: data.email, password: data.password })
-      const { user, token } = res.data
-      setAuth(user, token)
-      toast.success('Account created! One more step 🎉')
-      setStep(2)
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed.')
-    } finally {
-      setLoading(false)
-    }
+  setLoading(true)
+
+  try {
+    const res = await authApi.register({
+      fullName: data.fullName,
+      email: data.email,
+      password: data.password
+    })
+
+    const { user, token } = res.data.data
+
+    console.log("REGISTER USER:", user)
+    console.log("REGISTER TOKEN:", token)
+
+    setAuth(user, token)
+
+    toast.success('Account created! One more step 🎉')
+    setStep(2)
+
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Registration failed.')
+  } finally {
+    setLoading(false)
   }
+}
 
   function toggleInterest(tag) {
     setInterests((prev) => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])
