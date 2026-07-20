@@ -1,12 +1,12 @@
 const GROUPS = [
   {
     label: '13-Year Education',
-    url: 'https://chat.whatsapp.com/REPLACE_WITH_13YEAR_GROUP_LINK',
+    url: 'https://chat.whatsapp.com/HKJtUIOXznZEuvPjaICtWg?s=cl&p=a&ilr=0&amv=1',
     color: '#25D366',
   },
   {
     label: 'A/L Stream',
-    url: 'https://chat.whatsapp.com/REPLACE_WITH_AL_STREAM_GROUP_LINK',
+    url: 'https://chat.whatsapp.com/De7NaKYHIcr3C3KrGO3OxJ?s=cl&p=a&ilr=0&amv=1',
     color: '#128C7E',
   },
 ]
