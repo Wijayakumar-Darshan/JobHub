@@ -187,6 +187,16 @@ export default function LoginPage() {
             </Link>
           </div>
 
+          {/* --- Admin Login Link --- */}
+          <div className="mt-3 text-center">
+            <Link
+              to="/admin/login"
+              className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              👤 Admin login
+            </Link>
+          </div>
+
           <p className="text-center text-[11px] text-gray-400 mt-4 border-t border-gray-100 pt-4">
             <Link to="/admin/setup" className="hover:text-gray-600 underline decoration-dotted">
               First time deploying? Set up the admin account →
@@ -201,5 +211,3 @@ export default function LoginPage() {
     </div>
   )
 }
-
-
