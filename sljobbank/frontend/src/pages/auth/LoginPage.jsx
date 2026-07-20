@@ -12,12 +12,6 @@ const ROLE_ROUTES = {
   SUPER_ADMIN: '/admin/dashboard',
 }
 
-const DEMO_CREDENTIALS = {
-  student: { email: 'student@example.com', password: 'password123' },
-  counselor: { email: 'counselor@example.com', password: 'password123' },
-  admin: { email: 'admin@example.com', password: 'password123' },
-}
-
 export default function LoginPage() {
   const navigate = useNavigate()
   const { setAuth } = useAuthStore()
@@ -42,15 +36,6 @@ export default function LoginPage() {
       toast.error(err.response?.data?.message || err.message || 'Login failed.')
     } finally {
       setLoading(false)
-    }
-  }
-
-  function fillDemo(role) {
-    const creds = DEMO_CREDENTIALS[role]
-    if (creds) {
-      setValue('email', creds.email)
-      setValue('password', creds.password)
-      toast.success(`Demo credentials filled for ${role.charAt(0).toUpperCase() + role.slice(1)}!`, { duration: 2000 })
     }
   }
 
@@ -122,7 +107,6 @@ export default function LoginPage() {
           <div className="flex items-center justify-center gap-3 mt-3">
             <span className="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Students</span>
             <span className="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Counselors</span>
-            <span className="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Admins</span>
           </div>
         </div>
 
@@ -193,34 +177,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          {/* Demo quick login buttons */}
-          <div className="mt-6">
-            <p className="text-xs text-gray-400 text-center mb-3">Try a demo account:</p>
-            <div className="flex flex-wrap gap-2 justify-center">
-              <button
-                type="button"
-                onClick={() => fillDemo('student')}
-                className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium px-3 py-1.5 rounded-full transition-colors"
-              >
-                🎓 Student
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo('counselor')}
-                className="text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium px-3 py-1.5 rounded-full transition-colors"
-              >
-                🧑‍🏫 Counselor
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo('admin')}
-                className="text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium px-3 py-1.5 rounded-full transition-colors"
-              >
-                ⚙️ Admin
-              </button>
-            </div>
-          </div>
 
           <div className="mt-6 text-center">
             <Link
